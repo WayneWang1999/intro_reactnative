@@ -3,10 +3,13 @@ import { View, StyleSheet, TextInput } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { db } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
+import HouseItemModal from "../components/HouseItemMap";
+import Modal from "react-native-modal";
 
 export default function MapScreen() {
   const [houses, setHouses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedHouse, setSelectedHouse] = useState(null);
 
   useEffect(() => {
     const fetchHouses = async () => {
@@ -16,7 +19,6 @@ export default function MapScreen() {
           id: doc.id,
           ...doc.data(),
         }));
-
         setHouses(houseList);
       } catch (error) {
         console.error("Error fetching houses:", error);
@@ -26,36 +28,33 @@ export default function MapScreen() {
     fetchHouses();
   }, []);
 
-  const handleSearch = (text) => {
-    setSearchQuery(text);
-    // Implement search filtering logic if necessary
-  };
+  // Filter houses based on searchQuery
+  const filteredHouses = houses.filter((house) =>
+    house.address.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
-      {/* Search Box */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
           placeholder="Search for a house..."
           value={searchQuery}
-          onChangeText={handleSearch}
+          onChangeText={setSearchQuery}
           placeholderTextColor="#666"
         />
       </View>
 
-      {/* Map View */}
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: houses.length > 0 ? houses[0].latitude : 43.676, // Default to first house
+          latitude: houses.length > 0 ? houses[0].latitude : 43.676,
           longitude: houses.length > 0 ? houses[0].longitude : -79.4107,
           latitudeDelta: 0.1,
           longitudeDelta: 0.1,
         }}
       >
-        {/* Markers for Houses */}
-        {houses.map((house) =>
+        {filteredHouses.map((house) =>
           house.latitude && house.longitude ? (
             <Marker
               key={house.id}
@@ -65,10 +64,20 @@ export default function MapScreen() {
               }}
               title={house.address}
               description={`$${house.price}`}
+              onPress={() => setSelectedHouse(house)}
             />
           ) : null
         )}
       </MapView>
+
+      {/* Bottom Sheet Modal */}
+      <Modal
+        isVisible={!!selectedHouse}
+        onBackdropPress={() => setSelectedHouse(null)}
+        style={styles.bottomModal}
+      >
+        <HouseItemModal house={selectedHouse} onClose={() => setSelectedHouse(null)} />
+      </Modal>
     </View>
   );
 }
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
-    elevation: 5, // For Android shadow
+    elevation: 5,
   },
   input: {
     height: 45,
@@ -100,4 +109,9 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
+  bottomModal: {
+    justifyContent: "flex-end",
+    margin: 0, // Ensures modal starts at the bottom
+  },
 });
+

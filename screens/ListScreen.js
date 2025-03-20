@@ -1,35 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  StyleSheet,
-  Image,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, TextInput, FlatList, StyleSheet } from "react-native";
 import { db } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
-import Carousel from "react-native-reanimated-carousel"; // For image swap
-import { AntDesign } from "@expo/vector-icons"; // For heart icons
-
-const { width } = Dimensions.get("window");
+import HouseItem from "../components/HouseItem"; // Import HouseItem component
 
 export default function ListScreen() {
   const [houses, setHouses] = useState([]);
   const [filteredHouses, setFilteredHouses] = useState([]);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [favorites, setFavorites] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearch = (text) => {
-    setSearchQuery(text);
-    // Filter houses based on the search query
-    const filtered = houses.filter((house) =>
-      house.address.toLowerCase().includes(text.toLowerCase()) // Filter by address
-    );
-    setFilteredHouses(filtered);
-  };
 
   useEffect(() => {
     const fetchHouses = async () => {
@@ -40,7 +19,7 @@ export default function ListScreen() {
           ...doc.data(),
         }));
         setHouses(houseList);
-        setFilteredHouses(houseList); // Initialize filteredHouses with all houses
+        setFilteredHouses(houseList);
       } catch (error) {
         console.error("Error fetching houses:", error);
       }
@@ -49,8 +28,24 @@ export default function ListScreen() {
     fetchHouses();
   }, []);
 
-  const toggleFavorite = async () => {
-    // Add your favorite toggle logic here
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    const filtered = houses.filter((house) =>
+      house.address.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredHouses(filtered);
+  };
+
+  const toggleFavorite = (id) => {
+    setFavorites((prevFavorites) => {
+      const newFavorites = new Set(prevFavorites);
+      if (newFavorites.has(id)) {
+        newFavorites.delete(id);
+      } else {
+        newFavorites.add(id);
+      }
+      return newFavorites;
+    });
   };
 
   return (
@@ -69,48 +64,11 @@ export default function ListScreen() {
           data={filteredHouses}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.card}>
-              {item.imageUrl && item.imageUrl.length > 0 ? (
-                <Carousel
-                  loop
-                  width={width - 32}
-                  height={200}
-                  autoPlay
-                  autoPlayInterval={3000}
-                  data={item.imageUrl} // Array of image URLs
-                  renderItem={({ item }) => (
-                    <Image
-                      source={{ uri: item }}
-                      style={styles.carouselImage}
-                    />
-                  )}
-                />
-              ) : (
-                <Text>No Images Available</Text>
-              )}
-
-              {/* Wrap heart and price in a row */}
-              <View style={styles.priceHeartRow}>
-                <Text style={styles.price}>${item.price}</Text>
-                <TouchableOpacity
-                  onPress={toggleFavorite}
-                  style={styles.heartButton}
-                >
-                  <AntDesign
-                    name={isFavorite ? "heart" : "hearto"}
-                    size={28}
-                    color="red"
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.address}>{item.address}</Text>
-              <Text style={styles.details}>
-                Bedrooms: {item.bedrooms} | Bathrooms: {item.bathrooms} Area:{" "}
-                {item.area}
-              </Text>
-              <Text style={styles.details}>{item.createTime}</Text>
-            </View>
+            <HouseItem
+              item={item}
+              toggleFavorite={toggleFavorite}
+              isFavorite={favorites.has(item.id)}
+            />
           )}
         />
       )}
@@ -129,50 +87,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
-  },
-  card: {
-    backgroundColor: "#fff",
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    elevation: 3,
-    alignItems: "center",
-  },
-  carouselImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 8,
-    resizeMode: "cover",
-  },
-  address: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 8,
-    alignSelf: "flex-start",
-  },
-  details: {
-    fontSize: 14,
-    color: "gray",
-    marginTop: 4,
-    alignSelf: "flex-start",
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#007BFF",
-    marginTop: 8,
-    alignSelf: "flex-start",
-  },
-  heartButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-  },
-  priceHeartRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
   },
   input: {
     height: 40,
