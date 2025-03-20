@@ -77,7 +77,7 @@ export default function MapScreen() {
         style={styles.bottomModal}
       >
         <HouseItemModal house={selectedHouse} onClose={() => setSelectedHouse(null)} />
-      </Modal>
+      </Modal>      
     </View>
   );
 }

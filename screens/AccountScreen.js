@@ -32,12 +32,7 @@ export default function AccountScreen() {
       setUsername(email);
 
       Alert.alert("Login Successful", `Welcome, ${email}!`);
-      navigation.navigate("Favorite");
-      // Navigate to ProfileScreen with the username
-      // navigation.reset({
-      //   index: 0,
-      //   routes: [{ name: 'Profile', params: { username: email } }],
-      // });
+      navigation.navigate("Profile");
     } catch (error) {
       Alert.alert("Login Failed", error.message);
     }

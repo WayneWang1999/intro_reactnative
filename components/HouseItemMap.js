@@ -9,10 +9,13 @@ import {
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
-export default function HouseItemModal({ house, onClose ,toggleFavorite, isFavorite}) {
+export default function HouseItemModal({ house, onClose, toggleFavorite, isFavorite }) {
+  const navigation = useNavigation();
+
   if (!house) return null;
 
   return (
@@ -40,22 +43,30 @@ export default function HouseItemModal({ house, onClose ,toggleFavorite, isFavor
           <Text>No Images Available</Text>
         )}
 
-   
-        {/* </Text>Price and Favorite Button */}
-              <View style={styles.priceHeartRow}>
-                <Text style={styles.price}>${house.price}</Text>
-                <TouchableOpacity onPress={() => toggleFavorite(item.id)} style={styles.heartButton}>
-                  <AntDesign name={isFavorite ? "heart" : "hearto"} size={28} color="red" />
-                </TouchableOpacity>
-              </View>
-        
-              <Text style={styles.address}>{house.address}</Text>
-              <Text style={styles.details}>
-                Bedrooms: {house.bedrooms} | Bathrooms: {house.bathrooms} | Area: {house.area}
-              </Text>
-              <Text style={styles.details}>{house.createTime}</Text>
+        {/* Price and Favorite Button */}
+        <View style={styles.priceHeartRow}>
+          <Text style={styles.price}>${house.price}</Text>
+          <TouchableOpacity onPress={() => toggleFavorite(house.id)} style={styles.heartButton}>
+            <AntDesign name={isFavorite ? "heart" : "hearto"} size={28} color="red" />
+          </TouchableOpacity>
+        </View>
 
+        <Text style={styles.address}>{house.address}</Text>
+        <Text style={styles.details}>
+          Bedrooms: {house.bedrooms} | Bathrooms: {house.bathrooms} | Area: {house.area}
+        </Text>
+        <Text style={styles.details}>{house.createTime}</Text>
 
+        {/* View Details Button */}
+        <TouchableOpacity
+          style={styles.detailsButton}
+          onPress={() => {
+            onClose(); // Close modal before navigating
+            navigation.navigate("HouseDetail", { house });
+          }}
+        >
+          <Text style={styles.detailsButtonText}>View Details</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -69,7 +80,7 @@ const styles = StyleSheet.create({
   },
   bottomSheet: {
     width: "100%",
-    height: height * 0.4, // Adjust height as needed
+    height: height * 0.45, // Adjust height as needed
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -81,6 +92,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
+    padding: 0,
   },
   image: {
     width: "100%",
@@ -107,14 +119,24 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   heartButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
+    padding: 5,
   },
   priceHeartRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
+  },
+  detailsButton: {
+    marginTop: 0,
+    backgroundColor: "#007BFF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  detailsButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

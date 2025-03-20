@@ -1,45 +1,134 @@
-import React from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SignUpScreen() {
   const navigation = useNavigation();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-   const signUp = async () => {
-      // Add the sign-up functionality here
-      try {
-  
-       
-        // Create a new user with email and password
-        // await createUserWithEmailAndPassword(auth, email, password);
-  
-        // // After successful sign-up, set the email in the UserContext
-        // setUsername(email);
-  
-        // Alert.alert('Sign-Up Successful', `Welcome, ${email}!`);
-        // navigation.navigate('Favorite');
-      } catch (error) {
-        Alert.alert('Sign-Up Failed', error.message);
-      }
-    };
+  const signUp = () => {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+
+    Alert.alert("Sign-Up Successful", `Welcome, ${firstName}!`);
+    navigation.navigate("Favorite"); // Navigate to the next screen after signup
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Sign Up</Text>
 
-      <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry />
-      <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry />
+      <TextInput
+        style={styles.input}
+        placeholder="First Name"
+        value={firstName}
+        onChangeText={setFirstName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        value={lastName}
+        onChangeText={setLastName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Re-enter Password"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+      />
 
-      <Button title="Sign Up" onPress={() => alert('Account Created!')} />
+      <TouchableOpacity style={styles.signUpButton} onPress={signUp}>
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </TouchableOpacity>
 
-      <Button title="Back to Login" onPress={() => navigation.goBack()} color="red" />
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={styles.backButtonText}>Back to Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  input: { width: '80%', borderWidth: 1, padding: 10, marginBottom: 10 },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    backgroundColor: "#f9f9f9",
+  },
+  header: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    backgroundColor: "#fff",
+    marginBottom: 12,
+  },
+  signUpButton: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#007BFF",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  backButton: {
+    marginTop: 15,
+    paddingVertical: 10,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "bold",
+  },
 });

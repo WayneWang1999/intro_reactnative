@@ -5,11 +5,11 @@ import { AntDesign } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const HouseItem = ({ item, toggleFavorite, isFavorite }) => {
+const HouseItem = ({ item, toggleFavorite, isFavorite, onPress }) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity onPress={onPress} style={styles.card}>
       {/* Carousel for images */}
-      {item.imageUrl && item.imageUrl.length > 0 ? (
+      {Array.isArray(item.imageUrl) && item.imageUrl.length > 0 ? (
         <Carousel
           loop
           width={width - 32}
@@ -18,7 +18,9 @@ const HouseItem = ({ item, toggleFavorite, isFavorite }) => {
           autoPlayInterval={3000}
           data={item.imageUrl}
           renderItem={({ item }) => (
-            <Image source={{ uri: item }} style={styles.carouselImage} />
+            <View>
+              <Image source={{ uri: item }} style={styles.carouselImage} />
+            </View>
           )}
         />
       ) : (
@@ -37,8 +39,8 @@ const HouseItem = ({ item, toggleFavorite, isFavorite }) => {
       <Text style={styles.details}>
         Bedrooms: {item.bedrooms} | Bathrooms: {item.bathrooms} | Area: {item.area}
       </Text>
-      <Text style={styles.details}>{item.createTime}</Text>
-    </View>
+      <Text style={styles.details}>{item.createTime ? item.createTime : "Unknown Date"}</Text>
+    </TouchableOpacity>
   );
 };
 

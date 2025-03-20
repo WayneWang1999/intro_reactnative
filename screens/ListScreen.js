@@ -3,8 +3,9 @@ import { View, Text, TextInput, FlatList, StyleSheet } from "react-native";
 import { db } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import HouseItem from "../components/HouseItem"; // Import HouseItem component
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
 
-export default function ListScreen() {
+export default function ListScreen({ navigation }) {  // Add `navigation` as a prop
   const [houses, setHouses] = useState([]);
   const [filteredHouses, setFilteredHouses] = useState([]);
   const [favorites, setFavorites] = useState(new Set());
@@ -50,7 +51,8 @@ export default function ListScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>🏠 Favorite Houses</Text>
+      <Text style={styles.header}>Favorite Houses</Text>
+      
       <TextInput
         style={styles.input}
         placeholder="Search for a house..."
@@ -61,16 +63,17 @@ export default function ListScreen() {
         <Text>No houses found</Text>
       ) : (
         <FlatList
-          data={filteredHouses}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <HouseItem
-              item={item}
-              toggleFavorite={toggleFavorite}
-              isFavorite={favorites.has(item.id)}
-            />
-          )}
-        />
+        data={filteredHouses}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <HouseItem
+            item={item}
+            toggleFavorite={toggleFavorite}
+            isFavorite={favorites.has(item.id)}
+            onPress={() => navigation.navigate("HouseDetail", { house: item })}  // Pass onPress here
+          />
+        )}
+      />
       )}
     </View>
   );
