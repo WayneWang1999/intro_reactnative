@@ -9,6 +9,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+
 export default function SignUpScreen() {
   const navigation = useNavigation();
   const [firstName, setFirstName] = useState("");
@@ -17,8 +20,8 @@ export default function SignUpScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const signUp = () => {
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+  const signUp = async () => {
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
@@ -26,9 +29,28 @@ export default function SignUpScreen() {
       Alert.alert("Error", "Passwords do not match.");
       return;
     }
-
-    Alert.alert("Sign-Up Successful", `Welcome, ${firstName}!`);
-    navigation.navigate("Favorite"); // Navigate to the next screen after signup
+  
+    const auth = getAuth();
+    const db = getFirestore(); // Initialize Firestore
+  
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      const user = userCredential.user;
+  
+      // Add user to "buyers" collection in Firestore
+      await setDoc(doc(collection(db, "buyers"), user.uid), {
+        userId: user.uid, // Store the userId
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: user.email,
+        favoriteHouseIds: [], // Initialize an empty array for favorite houses
+      });
+  
+      Alert.alert("Sign-Up Successful", `Welcome, ${firstName.trim()}!`);
+      navigation.navigate("Favorite");
+    } catch (error) {
+      Alert.alert("Sign-Up Failed", error.message);
+    }
   };
 
   return (

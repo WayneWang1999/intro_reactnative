@@ -1,15 +1,22 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
-import { useUser } from '../UserContext';  // Import UserContext to access username
-import { useNavigation } from '@react-navigation/native';  // For navigation
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useUser } from "../UserContext"; // Import UserContext
+import { useNavigation } from "@react-navigation/native"; // For navigation
+import { getAuth, signOut } from "firebase/auth"; // Import Firebase auth
 
 export default function ProfileScreen() {
-  const { username, logout } = useUser();  // Get username and logout function from context
-  const navigation = useNavigation();  // For navigating to the login screen
+  const { username, setUsername } = useUser(); // Get username and setUsername from context
+  const navigation = useNavigation();
+  const auth = getAuth(); // Get Firebase auth instance
 
-  const handleLogout = () => {
-    //logout();  // Call logout function from context (uncomment this line when implemented)
-    navigation.navigate('Account');  // Navigate to the login screen
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out from Firebase
+      setUsername(null); // Reset username in context
+      navigation.navigate("Account"); // Navigate to the login screen
+    } catch (error) {
+      Alert.alert("Logout Failed", error.message);
+    }
   };
 
   return (
@@ -26,20 +33,20 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f7f7f7",
     padding: 20,
   },
   header: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: "700",
+    color: "#333",
     marginBottom: 10,
   },
   subHeader: {
     fontSize: 18,
-    color: '#555',
+    color: "#555",
     marginBottom: 30,
   },
   logoutButton: {
@@ -51,9 +58,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

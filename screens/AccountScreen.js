@@ -31,7 +31,7 @@ export default function AccountScreen() {
       // After successful login, set the email in the UserContext
       setUsername(email);
 
-      Alert.alert("Login Successful", `Welcome, ${email}!`);
+     // Alert.alert("Login Successful", `Welcome, ${email}!`);
       navigation.navigate("Profile");
     } catch (error) {
       Alert.alert("Login Failed", error.message);
