@@ -13,7 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
-export default function HouseItemModal({ house, onClose, toggleFavorite, isFavorite }) {
+export default function HouseItemMap({ house, onClose, toggleFavorite, isFavorite }) {
   const navigation = useNavigation();
 
   if (!house) return null;
@@ -21,7 +21,7 @@ export default function HouseItemModal({ house, onClose, toggleFavorite, isFavor
   return (
     <View style={styles.modalContainer}>
       <View style={styles.bottomSheet}>
-        {/* Close button */}
+        {/* Close Button */}
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <AntDesign name="close" size={24} color="black" />
         </TouchableOpacity>
@@ -30,7 +30,7 @@ export default function HouseItemModal({ house, onClose, toggleFavorite, isFavor
         {house.imageUrl && house.imageUrl.length > 0 ? (
           <Carousel
             loop
-            width={width - 60}
+            width={width - 40}
             height={200}
             autoPlay
             autoPlayInterval={3000}
@@ -40,7 +40,7 @@ export default function HouseItemModal({ house, onClose, toggleFavorite, isFavor
             )}
           />
         ) : (
-          <Text>No Images Available</Text>
+          <Text style={styles.noImageText}>No Images Available</Text>
         )}
 
         {/* Price and Favorite Button */}
@@ -51,11 +51,11 @@ export default function HouseItemModal({ house, onClose, toggleFavorite, isFavor
           </TouchableOpacity>
         </View>
 
+        {/* House Details */}
         <Text style={styles.address}>{house.address}</Text>
         <Text style={styles.details}>
-          Bedrooms: {house.bedrooms} | Bathrooms: {house.bathrooms} | Area: {house.area}
+          Bedrooms: {house.bedrooms} | Bathrooms: {house.bathrooms} | Area: {house.area} sqft
         </Text>
-        <Text style={styles.details}>{house.createTime}</Text>
 
         {/* View Details Button */}
         <TouchableOpacity
@@ -75,12 +75,12 @@ export default function HouseItemModal({ house, onClose, toggleFavorite, isFavor
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    justifyContent: "flex-end", // Push to bottom
-    backgroundColor: "rgba(0,0,0,0.5)", // Transparent background
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   bottomSheet: {
     width: "100%",
-    height: height * 0.45, // Adjust height as needed
+    height: height * 0.5,
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -91,13 +91,18 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     top: 10,
-    right: 10,
-    padding: 0,
+    right: 1,
   },
   image: {
     width: "100%",
     height: 200,
     borderRadius: 10,
+  },
+  noImageText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "gray",
+    marginVertical: 10,
   },
   address: {
     fontSize: 16,
@@ -105,34 +110,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignSelf: "flex-start",
   },
-  details: {
-    fontSize: 14,
-    color: "gray",
-    marginTop: 4,
-    alignSelf: "flex-start",
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#007BFF",
-    marginTop: 8,
-    alignSelf: "flex-start",
-  },
-  heartButton: {
-    padding: 5,
-  },
   priceHeartRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
   },
+  heartButton: {
+    padding: 5,
+  },
   detailsButton: {
-    marginTop: 0,
     backgroundColor: "#007BFF",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
+    marginTop: 10,
   },
   detailsButtonText: {
     color: "#fff",
@@ -140,3 +132,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+

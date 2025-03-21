@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { db } from "../firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where, updateDoc } from "firebase/firestore";
 import HouseItemModal from "../components/HouseItemMap";
 import Modal from "react-native-modal";
+import { useUser } from "../UserContext"; // Import user context
+import { useFocusEffect } from "@react-navigation/native"; // useFocusEffect for fetching when screen is focused
 
 export default function MapScreen() {
   const [houses, setHouses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedHouse, setSelectedHouse] = useState(null);
+  const [favorites, setFavorites] = useState(new Set());
 
+  const { username } = useUser(); // Get logged-in user email
+
+  // Fetch houses from Firestore
   useEffect(() => {
     const fetchHouses = async () => {
       try {
@@ -27,6 +33,73 @@ export default function MapScreen() {
 
     fetchHouses();
   }, []);
+
+  // Fetch user's favorite houses from Firestore
+  const fetchUserFavorites = useCallback(async () => {
+    if (!username) return; // Exit if user is not logged in
+
+    const buyersRef = collection(db, "buyers");
+    const q = query(buyersRef, where("email", "==", username));
+
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      setFavorites(new Set(userData.favoriteHouseIds || [])); // Ensure it's a Set
+    }
+  }, [username]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserFavorites(); // Fetch latest favorites whenever screen gains focus
+    }, [])
+  );
+  
+
+  const toggleFavorite = async (id) => {
+    try {
+      // Refetch favorites to ensure latest data
+      await fetchUserFavorites();
+  
+      setFavorites((prevFavorites) => {
+        const updatedFavorites = new Set(prevFavorites);
+        if (updatedFavorites.has(id)) {
+          updatedFavorites.delete(id);
+        } else {
+          updatedFavorites.add(id);
+        }
+  
+        // Update Firestore after modifying the favorites list
+        updateFirestoreFavorites(Array.from(updatedFavorites));
+  
+        return new Set(updatedFavorites);
+      });
+    } catch (error) {
+      console.error("Error updating favorite house:", error);
+    }
+  };
+  
+  
+  // Separate function to update Firestore
+  const updateFirestoreFavorites = async (updatedFavorites) => {
+    try {
+      const buyersRef = collection(db, "buyers");
+      const q = query(buyersRef, where("email", "==", username));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const userDocRef = querySnapshot.docs[0].ref;
+        await updateDoc(userDocRef, {
+          favoriteHouseIds: updatedFavorites, // Ensures latest state is used
+        });
+      } else {
+        console.error("User not found in buyers collection.");
+      }
+    } catch (error) {
+      console.error("Error updating favorite house:", error);
+    }
+  };
+  
+  
 
   // Filter houses based on searchQuery
   const filteredHouses = houses.filter((house) =>
@@ -65,6 +138,7 @@ export default function MapScreen() {
               title={house.address}
               description={`$${house.price}`}
               onPress={() => setSelectedHouse(house)}
+              pinColor={favorites.has(house.id) ? "gold" : "red"} // Highlight favorites
             />
           ) : null
         )}
@@ -76,8 +150,13 @@ export default function MapScreen() {
         onBackdropPress={() => setSelectedHouse(null)}
         style={styles.bottomModal}
       >
-        <HouseItemModal house={selectedHouse} onClose={() => setSelectedHouse(null)} />
-      </Modal>      
+        <HouseItemModal
+          house={selectedHouse}
+          isFavorite={favorites.has(selectedHouse?.id)}
+          toggleFavorite={toggleFavorite}
+          onClose={() => setSelectedHouse(null)}
+        />
+      </Modal>
     </View>
   );
 }
@@ -114,4 +193,3 @@ const styles = StyleSheet.create({
     margin: 0, // Ensures modal starts at the bottom
   },
 });
-
