@@ -1,11 +1,26 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { AntDesign } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const HouseItem = ({ item, toggleFavorite, isFavorite, onPress }) => {
+const HouseItem = ({
+  item,
+  toggleFavorite, // The toggleFavorite function is passed as a prop
+  isFavorite,
+  onPress,
+  globalFavoriteToggle,
+}) => {
+  const favoriteStatus = globalFavoriteToggle || isFavorite;
+
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
       {/* Carousel for images */}
@@ -30,16 +45,26 @@ const HouseItem = ({ item, toggleFavorite, isFavorite, onPress }) => {
       {/* Price and Favorite Button */}
       <View style={styles.priceHeartRow}>
         <Text style={styles.price}>${item.price}</Text>
-        <TouchableOpacity onPress={() => toggleFavorite(item.id)} style={styles.heartButton}>
-          <AntDesign name={isFavorite ? "heart" : "hearto"} size={28} color="red" />
+        <TouchableOpacity
+          onPress={() => toggleFavorite(item.id)} // Call the passed toggleFavorite function
+          style={styles.heartButton}
+        >
+          <AntDesign
+            name={favoriteStatus ? "heart" : "hearto"}
+            size={28}
+            color="red"
+          />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.address}>{item.address}</Text>
       <Text style={styles.details}>
-        Bedrooms: {item.bedrooms} | Bathrooms: {item.bathrooms} | Area: {item.area}
+        Bedrooms: {item.bedrooms} | Bathrooms: {item.bathrooms} | Area:{" "}
+        {item.area}
       </Text>
-      <Text style={styles.details}>{item.createTime ? item.createTime : "Unknown Date"}</Text>
+      <Text style={styles.details}>
+        {item.createTime ? item.createTime : "Unknown Date"}
+      </Text>
     </TouchableOpacity>
   );
 };
