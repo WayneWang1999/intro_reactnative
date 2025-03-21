@@ -5,7 +5,7 @@ import { db } from "../firebaseConfig";
 import { collection, getDocs, query, where, updateDoc } from "firebase/firestore";
 import HouseItemModal from "../components/HouseItemMap";
 import Modal from "react-native-modal";
-import { useUser } from "../UserContext"; // Import user context
+import { useUser } from "../shared/UserContext"; // Import user context
 import { useFocusEffect } from "@react-navigation/native"; // useFocusEffect for fetching when screen is focused
 
 export default function MapScreen() {

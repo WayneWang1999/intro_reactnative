@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, FlatList } from "react-native";
-import { useUser } from "../UserContext"; // Import the custom hook
+import { useUser } from "../shared/UserContext"; // Import the custom hook
 import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc } from "firebase/firestore"; // Import updateDoc
 import HouseItem from "../components/HouseItem"; // Import HouseItem component
 import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Import navigation hook and useFocusEffect

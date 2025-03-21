@@ -4,7 +4,7 @@ import { db } from "../firebaseConfig";
 import { collection, getDocs, query, where, updateDoc } from "firebase/firestore";
 import HouseItem from "../components/HouseItem";
 import { useNavigation } from "@react-navigation/native";
-import { useUser } from "../UserContext"; // Custom hook for user context
+import { useUser } from "../shared/UserContext"; // Custom hook for user context
 import { useFocusEffect } from "@react-navigation/native"; // useFocusEffect for fetching when screen is focused
 
 export default function ListScreen({ navigation }) {
