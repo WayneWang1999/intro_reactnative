@@ -10,8 +10,12 @@ const Stack = createStackNavigator();
 export default function FavoriteStackNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Favorite" component={FavoriteScreen} />
-      <Stack.Screen name="HouseDetail" component={HouseDetailScreen} />
+      <Stack.Screen name="FavoriteScreen" component={FavoriteScreen} />
+        <Stack.Screen 
+            name="HouseDetail" 
+            component={HouseDetailScreen} 
+            options={{ headerShown: true }} 
+          />
 
 
     </Stack.Navigator>

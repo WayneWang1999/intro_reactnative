@@ -13,7 +13,7 @@ export default function ProfileScreen() {
     try {
       await signOut(auth); // Sign out from Firebase
       setUsername(null); // Reset username in context
-      navigation.navigate("Account"); // Navigate to the login screen
+      navigation.navigate("AccountScreen"); // Navigate to the login screen
     } catch (error) {
       Alert.alert("Logout Failed", error.message);
     }

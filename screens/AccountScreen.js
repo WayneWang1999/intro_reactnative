@@ -8,7 +8,7 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
-// import { auth } from '../firebaseConfig';  // Import the Firebase auth instance
+//import { auth } from '../firebaseConfig';  // Import the Firebase auth instance
 import {
   getAuth,
   signInWithEmailAndPassword,

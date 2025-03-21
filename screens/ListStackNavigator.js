@@ -10,8 +10,12 @@ const Stack = createStackNavigator();
 export default function ListStackNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="List" component={ListScreen} />
-      <Stack.Screen name="HouseDetail" component={HouseDetailScreen} />
+      <Stack.Screen name="ListScreen" component={ListScreen} />
+      <Stack.Screen 
+      name="HouseDetail" 
+      component={HouseDetailScreen} 
+      options={{ headerShown: true }} 
+    />
       <Stack.Screen name="Filter" component={FilterScreen}/>
 
     </Stack.Navigator>
